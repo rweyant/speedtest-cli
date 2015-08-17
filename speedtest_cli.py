@@ -9,6 +9,7 @@ import socket
 import timeit
 import threading
 import requests
+import ipgetter
 
 __version__ = '0.3.2'
 
@@ -492,18 +493,6 @@ def version():
 
     raise SystemExit(__version__)
 
-def getIPAddress():
-    
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        s.connect(("gmail.com",80))
-        ip=s.getsockname()[0]
-        s.close()    
-    except socket.error:
-        print("problem determining IP address")
-        ip='000.000.0.0'
-    finally:
-        return ip
 
 def speedtest():
     """Run the full speedtest.net test"""
@@ -630,15 +619,14 @@ def speedtest():
         dlspeedh = (dlspeed / 1e6) * 8
         ulspeedh = (ulspeed / 1e6) * 8
 
-        ipaddress = getIPAddress()
+        ipaddress = ipgetter.myip()
                                
         #print('units: %s,%s' %(args.units[0],args.units[1]))
         print('Ping: %s' % ping)
         print('Download: %0.2f Mbits/s' % dlspeedh)
         print('Upload: %0.2f Mbit/s' % ulspeedh)
 
-
-        params={'entry.1828226196':ping,'entry.684344878':dlspeedh,'entry.719814121':ulspeedh}
+        params={'entry.1828226196':ping,'entry.684344878':dlspeedh,'entry.719814121':ulspeedh,'entry.876299641':ipaddress}
         base_url='https://docs.google.com/forms/d/1DJjECsiyOF0eZakcXdSPzNgc10otDLOxOJqwaQU4OfQ/formResponse'
         requests.post(base_url,data=params)
 def main():
