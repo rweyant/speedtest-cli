@@ -1,6 +1,0 @@
-setup.py
-Internet_Speed_Recorder.egg-info/PKG-INFO
-Internet_Speed_Recorder.egg-info/SOURCES.txt
-Internet_Speed_Recorder.egg-info/dependency_links.txt
-Internet_Speed_Recorder.egg-info/requires.txt
-Internet_Speed_Recorder.egg-info/top_level.txt
