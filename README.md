@@ -3,8 +3,11 @@ This is a utility that records current internet speed and pushes it to a google 
 
 # Setup
 ```
-git clone https://github.com/rweyant/speedtest-cli.git
-python setup.py install
+# From PyPi
+pip install speedrecorder
+
+# From GitHub
+pip install git+git://github.com/rweyant/speedtest-cli
 ```
 
 # Usage

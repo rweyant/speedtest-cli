@@ -3,7 +3,7 @@ from speedrecorder import speedtest
 
 def main():
     try:
-        speedtest(quiet=False)
+        speedtest(quiet=True)
     except KeyboardInterrupt:
         print('Exiting.')
 

@@ -494,7 +494,7 @@ def version():
     raise SystemExit(__version__)
 
 
-def speedtest():
+def speedtest(quiet=True):
     """Run the full speedtest.net test"""
 
     global shutdown_event, source
@@ -537,7 +537,7 @@ def speedtest():
                 unicode()
                 #print_('\n'.join(serverList).encode('utf-8', 'ignore'))
             except NameError:
-                print_('\n'.join(serverList))
+                print('\n'.join(serverList))
             except IOError:
                 pass
             sys.exit(0)
@@ -553,32 +553,29 @@ def speedtest():
         for i in range(0, 4):
             urls.append('%s/random%sx%s.jpg' %
                         (os.path.dirname(best['url']), size, size))
-    
-    # Testing download speed
-    dlspeed = downloadSpeed(urls)
 
     sizesizes = [int(.25 * 1000 * 1000), int(.5 * 1000 * 1000)]
     sizes = []
     for size in sizesizes:
         for i in range(0, 25):
             sizes.append(size)
-            
+    
+    # Testing download speed
+    dlspeed = downloadSpeed(urls)
+           
     # Testing upload speed
     ulspeed = uploadSpeed(best['url'], sizes)   
 
-    dlspeedk = int(round((dlspeed / 1000) * 8, 0))
     ping = int(round(best['latency'], 0))
-    ulspeedk = int(round((ulspeed / 1000) * 8, 0))
-    
     dlspeedh = (dlspeed / 1e6) * 8
     ulspeedh = (ulspeed / 1e6) * 8
 
     ipaddress = ipgetter.myip()
-                           
-    #print('units: %s,%s' %(args.units[0],args.units[1]))
-    print('Ping: %s' % ping)
-    print('Download: %0.2f Mbits/s' % dlspeedh)
-    print('Upload: %0.2f Mbit/s' % ulspeedh)
+
+    if not quiet:                           
+        print('Ping: %s' % ping)
+        print('Download: %0.2f Mbits/s' % dlspeedh)
+        print('Upload: %0.2f Mbit/s' % ulspeedh)
 
     params={'entry.1828226196':ping,'entry.684344878':dlspeedh,'entry.719814121':ulspeedh,'entry.876299641':ipaddress}
     base_url='https://docs.google.com/forms/d/1DJjECsiyOF0eZakcXdSPzNgc10otDLOxOJqwaQU4OfQ/formResponse'
