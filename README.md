@@ -9,6 +9,8 @@ python setup.py install
 
 # Usage
 
+From the command line
+
 ```
 # Get Internet Speed
 python examples/run_simple.py
@@ -18,5 +20,12 @@ python examples/continuous.py
 
 # Wait 10 minutes in between runs
 python examples/continuous.py --delay 10
+```
 
+Within a python script
+
+```
+import speedrecorder
+speedrecorder.speedtest()
+speedrecorder.speedtest(quiet=False)
 ```
