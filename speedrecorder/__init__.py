@@ -494,7 +494,13 @@ def version():
     raise SystemExit(__version__)
 
 
-def speedtest(quiet=True):
+def speedtest(quiet=True,
+              form_url='https://docs.google.com/forms/d/1DJjECsiyOF0eZakcXdSPzNgc10otDLOxOJqwaQU4OfQ',
+              ping_entry='entry.1828226196',
+              dl_entry='entry.684344878',
+              ul_entry='entry.719814121',
+              ip_entry='entry.876299641'
+              ):
     """Run the full speedtest.net test"""
 
     global shutdown_event, source
@@ -507,11 +513,6 @@ def speedtest(quiet=True):
     
 
     socket.setdefaulttimeout(default_timeout)
-
-    # If specified bind to a specific IP address
-    #if args.source:
-    #    source = args.source
-    #    socket.socket = bound_socket
 
     #Retrieving speedtest.net configuration        
     try:
@@ -577,6 +578,6 @@ def speedtest(quiet=True):
         print('Download: %0.2f Mbits/s' % dlspeedh)
         print('Upload: %0.2f Mbit/s' % ulspeedh)
 
-    params={'entry.1828226196':ping,'entry.684344878':dlspeedh,'entry.719814121':ulspeedh,'entry.876299641':ipaddress}
-    base_url='https://docs.google.com/forms/d/1DJjECsiyOF0eZakcXdSPzNgc10otDLOxOJqwaQU4OfQ/formResponse'
+    params={ping_entry:ping,dl_entry:dlspeedh,ul_entry:ulspeedh,ip_entry:ipaddress}
+    base_url=form_url+'/formResponse'
     requests.post(base_url,data=params)
