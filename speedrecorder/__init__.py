@@ -11,7 +11,7 @@ import threading
 import requests
 import ipgetter
 
-__version__ = '0.3.2'
+__version__ = '0.1.1'
 
 # Some global variables we use
 user_agent = 'speedtest-cli/%s' % __version__
@@ -75,8 +75,8 @@ except ImportError:
     def print_(*args, **kwargs):
         """The new-style print function taken from
         https://pypi.python.org/pypi/six/
-
         """
+        
         fp = kwargs.pop("file", sys.stdout)
         if fp is None:
             return
@@ -129,7 +129,6 @@ else:
 class SpeedtestCliServerListError(Exception):
     """Internal Exception class used to indicate to move on to the next
     URL for retrieving speedtest.net server details
-
     """
 
 

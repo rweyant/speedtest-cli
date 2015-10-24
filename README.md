@@ -1,8 +1,12 @@
 # Project
-This is a utility that records current internet speed and pushes it to a google form
-
+This is a utility that records current internet speed and pushes it to a google form. 
+It is mainly for personal use, but could be easily adapted to general purposes.
+Much of the code was taken from Matt Martz's project [speedtest-cli](https://github.com/sivel/speedtest-cli) ([PyPi](https://pypi.python.org/pypi/speedtest-cli/))
 
 # Setup
+
+This project was put on PyPI mainly as a learning exercise.
+
 ```
 # From PyPi
 pip install speedrecorder
