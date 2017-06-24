@@ -10,6 +10,7 @@ import timeit
 import threading
 import requests
 import ipgetter
+import logging
 
 __version__ = '0.1.1'
 
@@ -493,15 +494,34 @@ def version():
     raise SystemExit(__version__)
 
 
-def speedtest(quiet=True,
-              form_url='https://docs.google.com/forms/d/1DJjECsiyOF0eZakcXdSPzNgc10otDLOxOJqwaQU4OfQ',
-              ping_entry='entry.1828226196',
-              dl_entry='entry.684344878',
-              ul_entry='entry.719814121',
-              ip_entry='entry.876299641'
-              ):
+def speedtest(to_google=True, to_log=False, base_url=None, ping_input=None, dl_input=None, ul_input=None,
+              ip_input=None, log_file_path=None, quiet=True):
     """Run the full speedtest.net test"""
 
+    if to_google == True:
+        if None in (base_url, ping_input, dl_input, ul_input, ip_input):
+            logging.error('''You have indicated that you would like to send your output to a Google Form.\n
+             This requires that you provide a form url (base_url), and the 4 form input variables.\n
+             Please read the README file for help on finding those values on the form. \n
+             If you do not want to send output to a Google form, then set to_google = False''')
+            exit()
+
+    if to_log == True and log_file_path == None:
+        logging.error('''You have indicated that you would like to logout put to a local file but have not \n
+        specified a file to which to write. Please set log_file_path = to a valid file on your local machine''')
+        exit()
+
+    elif to_log == True and log_file_path <> None:
+        logging.basicConfig(filename=log_file_path, filemode='a', level=logging.INFO)
+        console = logging.StreamHandler()
+        console.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+        logging.getLogger('').addHandler(console)
+
+    elif to_log == False and quiet <> True:
+        logging.basicConfig(level=logging.INFO)
+
+    logging.info('>>>>>>Starting Speedtest<<<<<<')
     global shutdown_event, source
     shutdown_event = threading.Event()
 
@@ -546,7 +566,7 @@ def speedtest(quiet=True,
 
     #Selecting best server based on latency
     best = getBestServer(servers)
-
+    logging.info("Best server: {0}".format(best['host']))
     sizes = [350, 500, 750, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
     urls = []
     for size in sizes:
@@ -562,21 +582,42 @@ def speedtest(quiet=True,
     
     # Testing download speed
     dlspeed = downloadSpeed(urls)
-           
+
     # Testing upload speed
-    ulspeed = uploadSpeed(best['url'], sizes)   
+    ulspeed = uploadSpeed(best['url'], sizes)
 
     ping = int(round(best['latency'], 0))
     dlspeedh = (dlspeed / 1e6) * 8
     ulspeedh = (ulspeed / 1e6) * 8
-
+    logging.info("Ping: {0}".format(ping))
+    logging.info("Download: {0} Mbits/s".format(dlspeedh))
+    logging.info("Upload Speed: {0} Mbit/s".format(ulspeedh))
     ipaddress = ipgetter.myip()
 
-    if not quiet:                           
-        print('Ping: %s' % ping)
-        print('Download: %0.2f Mbits/s' % dlspeedh)
-        print('Upload: %0.2f Mbit/s' % ulspeedh)
+    # if not quiet:
+    #     print('Ping: %s' % ping)
+    #     print('Download: %0.2f Mbits/s' % dlspeedh)
+    #     print('Upload: %0.2f Mbit/s' % ulspeedh)
 
-    params={ping_entry:ping,dl_entry:dlspeedh,ul_entry:ulspeedh,ip_entry:ipaddress}
-    base_url=form_url+'/formResponse'
-    requests.post(base_url,data=params)
+    if to_google == True:
+        params = {ping_input: ping, dl_input: dlspeedh, ul_input: ulspeedh,
+                  ip_input: ipaddress}
+
+        # base_url='https://docs.google.com/forms/d/1DJjECsiyOF0eZakcXdSPzNgc10otDLOxOJqwaQU4OfQ/formResponse'
+        # base_url = 'https://docs.google.com/forms/d/e/1FAIpQLSf3zi5czZT8hsV3qBEcEDak0egvORvPRbhawaTyeSKQR8NFyg/formResponse'
+        if base_url[len(base_url) - 1] == '/':
+            view_url = base_url + 'viewform'
+            request_url = base_url + 'formResponse'
+        else:
+            view_url = base_url + '/viewform'
+            request_url = base_url + '/formResponse'
+        user_agent = {
+            'Referer': view_url,
+            'User-Agent': "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.52 Safari/537.36"}
+
+        r = requests.post(request_url,data=params, headers=user_agent)
+        logging.info('Google Form Response: {0}'.format(r.status_code))
+        if r.status_code <> 200:
+            logging.warning(r.reason)
+
+    logging.info(">>>>>>Speedtest Complete<<<<<<")
